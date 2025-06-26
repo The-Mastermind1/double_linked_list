@@ -171,12 +171,25 @@ private:
 	//
 	//
 	void insert_node(const _Ty& data) {
+		list_node* ptr{ new (std::nothrow)list_node{data} };
+		if (ptr == nullptr)return;
 		list_node* prev{ nullptr };
 		list_node* curr{ head };
 		while (curr != nullptr && curr->data < data) {
 			prev = curr;
 			curr = curr->next;
 		}
+		count++;
+		if (prev == nullptr) {
+
+		}
+		if (curr != nullptr) {
+
+		}
+		if (curr == nullptr) {
+
+		}
+
 
 	}
 public:
