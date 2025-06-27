@@ -836,7 +836,7 @@ void double_linked_list<_Ty>::merge(double_linked_list<_Ty>& other)noexcept {
 //
 template<typename _Ty>
 std::size_t double_linked_list<_Ty>::merge(const double_linked_list<_Ty>& other1,const double_linked_list<_Ty>& other2)noexcept {
-	merge_in_place(other1, other2);
+	return merge_in_place(other1, other2);
 }
 //
 _PANAGIOTIS_END
