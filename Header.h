@@ -1,3 +1,4 @@
+
 #pragma once
 #include<iostream>
 #include<functional>
@@ -19,12 +20,13 @@ private:
 		list_node* next;
 		list_node* prev;
 		list_node() :data{}, next{}, prev{}
-		{ }
-		list_node(const _Ty& item)noexcept(noexcept(data=item)) :next{}, prev{}
+		{
+		}
+		list_node(const _Ty& item)noexcept(noexcept(data = item)) :next{}, prev{}
 		{
 			data = item;
 		}
-		list_node(_Ty&& item)noexcept(noexcept(data =std::move(item))) :next{}, prev{}
+		list_node(_Ty&& item)noexcept(noexcept(data = std::move(item))) :next{}, prev{}
 		{
 			data = std::move(item);
 		}
@@ -38,7 +40,7 @@ private:
 		list_node* ptr{ new(std::nothrow)list_node{std::forward<_Valty>(_Val)} };
 		if (ptr != nullptr) {
 			ptr->prev = tail;
-			if (head==nullptr) {
+			if (head == nullptr) {
 				head = ptr;
 			}
 			else {
@@ -65,11 +67,11 @@ private:
 	//
 	//
 	template<typename _Valty>
-	bool push_front_node(_Valty &&_Val) {
+	bool push_front_node(_Valty&& _Val) {
 		list_node* ptr{ new(std::nothrow)list_node{std::forward<_Valty>(_Val)} };
 		if (ptr != nullptr) {
 			ptr->next = head;
-			if (head==nullptr) {
+			if (head == nullptr) {
 				tail = ptr;
 			}
 			else {
@@ -89,7 +91,7 @@ private:
 			list_node* ptr{ head };
 			head = head->next;
 			delete ptr;
-			if (head==nullptr) {
+			if (head == nullptr) {
 				tail = nullptr;
 			}
 			else {
@@ -114,7 +116,7 @@ private:
 				list_node* ptr{ tail };
 				tail = tail->prev;
 				delete ptr;
-				
+
 			}
 
 			return;
@@ -146,7 +148,7 @@ private:
 		return;
 	}*/
 	//
-	void reverse_list() noexcept{
+	void reverse_list() noexcept {
 		if (count < 2)return;
 		tail = head;
 		list_node* ptr1{ head };
@@ -164,9 +166,9 @@ private:
 
 			ptr2 = ptr1->next;
 
-			
+
 		}
-		
+
 	}
 	//
 	//
@@ -181,17 +183,239 @@ private:
 		}
 		count++;
 		if (prev == nullptr) {
-
+			ptr->next = head;
+			if (head == nullptr) {
+				tail = ptr;
+			}
+			else {
+				head->prev = ptr;
+			}
+			head = ptr;
+			return;
 		}
-		if (curr != nullptr) {
-
+		else  {
+			prev->next = ptr;
+			ptr->prev = prev;
+			ptr->next = curr;
+			if (curr != nullptr)
+				curr->prev = ptr;
+			else
+				tail = ptr;
 		}
-		if (curr == nullptr) {
-
-		}
+		return;
 
 
 	}
+	//
+	//
+	bool add_unique_node(const _Ty& data) {
+		list_node* ptr{ new (std::nothrow)list_node{data} };
+		if (ptr == nullptr)return false;
+		list_node* prev{ nullptr };
+		list_node* curr{ nullptr };
+		while (curr != nullptr && curr->data < data) {
+			prev = curr;
+			curr = curr->next;
+		}
+		list_node* ptr1{ curr };
+		while (ptr1 != nullptr) {
+			if (ptr1->data == data)return false;
+			ptr1 = ptr1->next;
+		}
+		count++;
+		if (prev == nullptr) {
+			ptr->next = head;
+			if (head == nullptr) {
+				tail = ptr;
+			}
+			else {
+				head->prev = ptr;
+			}
+			head = ptr;
+			return;
+		}
+		else {
+			prev->next = ptr;
+			ptr->prev = prev;
+			ptr->next = curr;
+			if (curr != nullptr)
+				curr->prev = ptr;
+			else
+				tail = ptr;
+		}
+		return true;
+		
+	}
+	//
+	//
+	void erase_all(const _Ty& data)noexcept {
+		while (head != nullptr && head->data == data) {
+			pop_front();
+		}
+		if (head != nullptr) {
+			list_node* prev{ head };
+			list_node* curr{ head->next };
+			while (curr != nullptr) {
+				if (curr->data == data) {
+					count--;
+					prev->next = curr->next;
+					if (curr->next != nullptr) {
+						curr->next->prev = prev;
+					}
+					
+					delete curr;
+					curr = prev->next;
+
+				}
+				else {
+					prev = curr;
+					curr = curr->next;
+				}
+			}
+			tail = prev;
+		}
+	}
+	// 
+	// 	
+	void erase_first(const _Ty&data)noexcept {
+		list_node* prev{ nullptr };
+		list_node* curr{ head };
+		while (curr != nullptr && curr->data != data) {
+			prev = curr;
+			curr = curr->next;
+		}
+		if (prev == nullptr &&curr!=nullptr) {
+			pop_front();
+			return;
+		}
+		if (prev!=nullptr &&curr != nullptr) {
+			count--;
+			prev->next = curr->next;
+			if (curr->next != nullptr) {
+				curr->next->prev = prev;
+			}
+			else {
+				tail = prev;
+			}
+			delete curr;
+		}
+		
+	}
+	//
+	//
+	void erase_duplicates() {
+		if (count < 2)return;
+		list_node* prev{ head };
+		list_node* curr{ head->next };
+		while (curr != nullptr) {
+			if (prev->data == curr->data) {
+				count--;
+				prev->next = curr->next;
+				if (curr->next != nullptr) {
+					curr->next->prev = prev;
+				}
+				delete curr;
+				curr = prev->next;
+		
+
+
+			}
+			else {
+				prev = prev->next;
+				curr = curr->next;
+			}
+		}
+		tail = prev;
+		return;
+	}
+	//
+	//
+	void merge_in_place(double_linked_list<_Ty>& other)noexcept {
+		if (this == &other)return;
+		if (empty() && other.empty())return;
+		if (!is_ascending() && !other.is_ascending())return;
+		list_node* dummy{ new (std::nothrow)list_node{} };
+		if (dummy == nullptr)return;
+		list_node* ptr{ dummy };
+		list_node* curr1{ head };
+		list_node* curr2{ other.head };
+		while (curr1 != nullptr && curr2 != nullptr) {
+			if (curr1->data <= curr2->data) {
+				ptr->next = curr1;
+				curr1->prev = ptr;
+				ptr = ptr->next;
+				curr1 = curr1->next;
+			}
+			else {
+				ptr->next = curr2;
+				curr2->prev = ptr;
+				ptr = ptr->next;
+				curr2 = curr2->next;
+			}
+		}
+		
+		if (curr1 == nullptr && curr2 != nullptr) {
+			ptr->next = curr2;
+			curr2->prev = ptr;
+			tail = other.tail;
+		}
+		if (curr2 == nullptr && curr1 != nullptr) {
+			ptr->next = curr1;
+			curr1->prev = ptr;
+		}
+		
+		head = dummy->next;
+		head->prev = nullptr;
+		count = count + other.count;
+		delete dummy;
+		other.head = other.tail = nullptr;
+		other.count = 0;
+	}
+	//
+	//
+	std::size_t merge_in_place(const double_linked_list<_Ty> &other1
+	,const double_linked_list<_Ty> &other2) {
+		if (this == &other1 || this == &other2)return 0;
+		if (other1.empty() && other2.empty())return 0;
+		if (!other1.is_ascending() && !other2.is_ascending())return 0;
+
+		clear();
+		list_node* curr1{ other1.head };
+		list_node* curr2{ other2.head };
+		while (curr1 != nullptr && curr2 != nullptr) {
+			if (curr1->data <= curr2->data) {
+				if (!push_back(curr1->data)) {
+					clear();
+					return 0;
+				}
+				curr1 = curr1->next;
+			}
+			else {
+				if (!push_back(curr2->data)) {
+					clear();
+					return 0;
+				}
+				curr2 = curr2->next;
+			}
+		}
+		while (curr1 != nullptr) {
+			if (!push_back(curr1->data)) {
+				clear();
+				return 0;
+			}
+			curr1 = curr1->next;
+		}
+		while (curr2 != nullptr) {
+			if (!push_back(curr2->data)) {
+				clear();
+				return 0;
+			}
+			curr2 = curr2->next;
+		}
+		return count;//the count of nodes that merged
+	}
+	//
+
 public:
 	double_linked_list()noexcept;
 	double_linked_list(const std::initializer_list<_Ty>& l);
@@ -199,7 +423,7 @@ public:
 	double_linked_list(double_linked_list<_Ty>&& other)noexcept;
 	~double_linked_list()noexcept;
 	double_linked_list<_Ty>& operator=(const double_linked_list<_Ty>& Other)&;
-	double_linked_list<_Ty>& operator=(double_linked_list<_Ty>&& Other)& noexcept;
+	double_linked_list<_Ty>& operator=(double_linked_list<_Ty>&& Other) & noexcept;
 	bool push_back(const _Ty& data);
 	bool push_back(_Ty&& data);
 	bool push_front(const _Ty& data);
@@ -210,10 +434,23 @@ public:
 	bool is_descending()const noexcept;
 	bool is_sorted()const noexcept;
 	bool empty()const noexcept;
+
+	void delete_first(const _Ty& data)noexcept;
+
+	bool add_unique(const _Ty& data);
+
+	void delete_duplicates() noexcept;
+	void delete_all(const _Ty& data)noexcept;
+
 	std::size_t size()const noexcept;
 	void insert(const _Ty& data);
 	void reverse()noexcept;
 	void show();
+
+	void merge( double_linked_list<_Ty>& other)noexcept;
+
+	std::size_t merge(const double_linked_list<_Ty>& other1,
+		const double_linked_list<_Ty>& other2)noexcept;
 	std::size_t count_items()const noexcept;
 	_NODISCARD _Ty&& back()&& {
 		if (count == 0) {
@@ -272,15 +509,46 @@ public:
 		return std::move(head->data);
 
 	}
-	
-	
+	//
+	//
+	void add_front(const double_linked_list<_Ty>& other) {
+		if (other.empty())return;
+		list_node* ptr{ other.head };
+		while (ptr != nullptr) {
+			if (!push_front(ptr->data)) {
+				clear();
+				break;
+
+			}
+			ptr = ptr->next;
+		}
+	}
+	//
+	//
+	void add_front(const double_linked_list<_Ty>& other) {
+		if (other.empty())return;
+		list_node* ptr{ other.head };
+		while (ptr != nullptr) {
+			if (!push_back(ptr->data)) {
+				clear();
+				break;
+
+			}
+			ptr = ptr->next;
+		}
+
+	}
+
+
+
 
 
 };
 //
 template<typename _Ty>
 double_linked_list<_Ty>::double_linked_list()noexcept :head{}, tail{}, count{}
-{}
+{
+}
 //
 //
 template<typename _Ty>
@@ -307,7 +575,7 @@ bool double_linked_list<_Ty>::push_back(const _Ty& data) {
 //
 //
 template<typename _Ty>
-bool double_linked_list<_Ty>::push_back( _Ty&& data) {
+bool double_linked_list<_Ty>::push_back(_Ty&& data) {
 	return push_back_node(std::move(data));
 }
 //
@@ -319,6 +587,7 @@ void double_linked_list<_Ty>::show() {
 		std::cout << ptr->data << '\n';
 		ptr = ptr->next;
 	}
+	std::cout << "\n";
 	ptr = tail;
 	while (ptr != nullptr) {
 		std::cout << ptr->data << '\n';
@@ -335,7 +604,7 @@ bool double_linked_list<_Ty>::push_front(const _Ty& data) {
 //
 //
 template<typename _Ty>
-bool double_linked_list<_Ty>::push_front( _Ty&& data) {
+bool double_linked_list<_Ty>::push_front(_Ty&& data) {
 	return push_front_node(data);
 }
 //
@@ -370,7 +639,7 @@ void double_linked_list<_Ty>::reverse()noexcept {
 //
 //
 template<typename _Ty>
-double_linked_list<_Ty>::double_linked_list(const double_linked_list<_Ty>& other) {
+double_linked_list<_Ty>::double_linked_list(const double_linked_list<_Ty>& other) :head{}, count{}, tail{} {
 	list_node* ptr{ head };
 	while (ptr != nullptr) {
 		if (!push_back(ptr->data)) {
@@ -408,7 +677,7 @@ operator=(const double_linked_list<_Ty>& other)& {
 			curr1 = curr1->next;
 			curr2 = curr2->next;
 		}
-		if (prev1 == nullptr && curr2 != nullptr|| curr2 != nullptr && curr1 == nullptr) {
+		if (prev1 == nullptr && curr2 != nullptr || curr2 != nullptr && curr1 == nullptr) {
 			while (curr2 != nullptr) {
 				if (!push_back(curr2->data)) {
 					clear();
@@ -434,14 +703,14 @@ operator=(const double_linked_list<_Ty>& other)& {
 			}
 			return *this;
 		}
-		
+
 	}
 	return *this;
 }
 //
 //
 template<typename _Ty>
-double_linked_list<_Ty>::double_linked_list(const std::initializer_list<_Ty>& l) {
+double_linked_list<_Ty>::double_linked_list(const std::initializer_list<_Ty>& l) :head{}, tail{}, count{} {
 	const _Ty* ptr{ l.begin() };
 	for (std::size_t i = 0; i < l.size(); i++) {
 		if (!push_back(*ptr)) {
@@ -457,12 +726,12 @@ template <typename _Ty>
 bool double_linked_list<_Ty>::
 is_ascending() const noexcept
 {
-	if (count < 2) return true;		
+	if (count < 2) return true;
 
 	list_node* CurrNode = head;
 	list_node* NextNode = head->next;
 
-	do	
+	do
 	{
 		if (NextNode->data <= CurrNode->data) return false;
 		CurrNode = NextNode;
@@ -470,19 +739,19 @@ is_ascending() const noexcept
 	} while (NextNode != nullptr);
 
 	return true;
-}	
+}
 //
 //
 template <typename _Ty>
 bool double_linked_list<_Ty>::
 is_descending() const noexcept
 {
-	if (count < 2) return true;	
+	if (count < 2) return true;
 
 	list_node* CurrNode = head;
 	list_node* NextNode = head->Next;
 
-	do	
+	do
 	{
 		if (CurrNode->data <= NextNode->data) return false;
 		CurrNode = NextNode;
@@ -490,21 +759,21 @@ is_descending() const noexcept
 	} while (NextNode != nullptr);
 
 	return true;
-}	
+}
 //
 //
 template <typename _Ty>
 bool double_linked_list<_Ty>::
 is_sorted() const noexcept
 {
-	if (count < 2) return true;		
+	if (count < 2) return true;
 
 	list_node* CurrNode = head;
 	list_node* NextNode = head->Next;
 	bool		Asc = true;
 	bool		Desc = true;
 
-	do	
+	do
 	{
 		Asc = Asc && (CurrNode->data <= NextNode->data);
 		Desc = Desc && (NextNode->data <= CurrNode->data);
@@ -530,6 +799,44 @@ std::size_t double_linked_list<_Ty>::count_items()const noexcept {
 //
 template<typename _Ty>
 void double_linked_list<_Ty>::insert(const _Ty& data) {
-	insert_node();
+	insert_node(data);
 }
+//
+//
+template<typename _Ty>
+bool double_linked_list<_Ty>::add_unique(const _Ty& data) {
+	return add_unique_node(data);
+}
+//
+//
+template<typename _Ty>
+void double_linked_list<_Ty>::delete_duplicates() noexcept{
+	erase_duplicates();
+}
+//
+//
+template<typename _Ty>
+void double_linked_list<_Ty>::delete_all(const _Ty& data)noexcept {
+	erase_all(data);
+
+}
+//
+//
+template<typename _Ty>
+void double_linked_list<_Ty>::delete_first(const _Ty& data)noexcept {
+	erase_first(data);
+}
+//
+//
+template<typename _Ty>
+void double_linked_list<_Ty>::merge(double_linked_list<_Ty>& other)noexcept {
+	merge_in_place(other);
+}
+//
+//
+template<typename _Ty>
+std::size_t double_linked_list<_Ty>::merge(const double_linked_list<_Ty>& other1,const double_linked_list<_Ty>& other2)noexcept {
+	merge_in_place(other1, other2);
+}
+//
 _PANAGIOTIS_END
